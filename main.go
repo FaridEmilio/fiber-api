@@ -38,11 +38,23 @@ func InicializarApp(clienteHttp *http.Client) *fiber.App {
 		return ctx.SendString("My first APi with Fiber")
 	})
 
-	// Prefijo comun a mis endpoints
-	api := app.Group("/api/user")
+	// Prefijo comun a mis endpoints de user
+	api_user := app.Group("/api/user")
+
+	// Prefijo comun a mis endpoints de product
+	api_product := app.Group("/api/product")
+
+	// Prefijo comun a mis endpoints de order
+	api_order := app.Group("/api/order")
 
 	//Aca importo todos los endpoints de user
-	routes.UserRoutes(api)
+	routes.UserRoutes(api_user)
+
+	//Aca importo todos los endpoints de product
+	routes.ProductRoutes(api_product)
+
+	//Aca importo todos los endpoints de order
+	routes.OrderRoutes(api_order)
 
 	return app
 
