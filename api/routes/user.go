@@ -20,6 +20,8 @@ func UserRoutes(app fiber.Router) {
 	app.Post("/new", CreateUser())
 	app.Get("/list", GetUsers())
 	app.Get("/find/:id", GetUserById())
+	app.Put("/update/:id", UpdateUser())
+	app.Delete("/delete/:id", DeleteUSer())
 }
 
 func CreateResponseUser(userModel pkg.User) User {
@@ -99,5 +101,77 @@ func GetUsers() fiber.Handler {
 		}
 
 		return ctx.Status(200).JSON(responseUsers)
+	}
+}
+
+func UpdateUser() fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		id, err := ctx.ParamsInt("id")
+
+		var user pkg.User
+
+		if err != nil {
+			return ctx.Status(400).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		if err := findUser(id, &user); err != nil {
+			return ctx.Status(400).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		type UpdateUser struct {
+			FirstName string `json:"first_name"`
+			LastName  string `json:"last_name"`
+		}
+
+		var updateData UpdateUser
+
+		if err := ctx.BodyParser(&updateData); err != nil {
+			return ctx.Status(500).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		user.FirstName = updateData.FirstName
+		user.LastName = updateData.LastName
+
+		internal.Database.Db.Save(&user)
+
+		responseUser := CreateResponseUser(user)
+
+		return ctx.Status(200).JSON(responseUser)
+
+	}
+}
+
+func DeleteUSer() fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		id, err := ctx.ParamsInt("id")
+
+		var user pkg.User
+
+		if err != nil {
+			return ctx.Status(400).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		if err := findUser(id, &user); err != nil {
+			return ctx.Status(400).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		if err := internal.Database.Db.Delete(&user).Error; err != nil {
+			return ctx.Status(404).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		return ctx.Status(200).SendString("Usuario eliminado con éxito")
+
 	}
 }

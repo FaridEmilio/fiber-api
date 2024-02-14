@@ -9,5 +9,6 @@ type Order struct {
 	//Relacion con producto: foreign key
 	Product   Product `gorm:"foreignKey: ProductRefer"`
 	UserRefer int     `json:"user_id"`
-	User      User    `gorm:"foreignKey:UserRefer"`
+	//Relacion con Usuario
+	User User `gorm:"foreignKey:UserRefer"`
 }
