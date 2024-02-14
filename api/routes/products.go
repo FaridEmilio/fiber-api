@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	internal "github.com/faridEmilio/fiber-api/internal/database"
-	pkg "github.com/faridEmilio/fiber-api/pkg/models"
+	pkg "github.com/faridEmilio/fiber-api/pkg/entities"
 	"github.com/gofiber/fiber/v2"
 )
 

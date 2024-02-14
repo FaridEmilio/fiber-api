@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/faridEmilio/fiber-api/internal/config"
-	pkg "github.com/faridEmilio/fiber-api/pkg/models"
+	pkg "github.com/faridEmilio/fiber-api/pkg/entities"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
