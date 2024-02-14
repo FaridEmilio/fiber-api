@@ -4,7 +4,7 @@ import "time"
 
 type Order struct {
 	ID           uint `json: "id" gorm:"primaryKey"`
-	CratedAt     time.Time
+	CreatedAt    time.Time
 	ProductRefer int `json:"product_id"`
 	//Relacion con producto: foreign key
 	Product   Product `gorm:"foreignKey: ProductRefer"`
