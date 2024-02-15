@@ -49,20 +49,20 @@ func InicializarApp(clienteHttp *http.Client, clienteSql *database.DbInstance) *
 	// Prefijo comun a mis endpoints de user
 	api_user := app.Group("/api/user")
 
-	// Prefijo comun a mis endpoints de product
-	api_product := app.Group("/api/product")
+	// // Prefijo comun a mis endpoints de product
+	// api_product := app.Group("/api/product")
 
-	// Prefijo comun a mis endpoints de order
-	api_order := app.Group("/api/order")
+	// // Prefijo comun a mis endpoints de order
+	// api_order := app.Group("/api/order")
 
 	//Aca importo todos los endpoints de user
 	routes.UserRoutes(api_user, userService)
 
-	//Aca importo todos los endpoints de product
-	routes.ProductRoutes(api_product)
+	// //Aca importo todos los endpoints de product
+	// routes.ProductRoutes(api_product)
 
-	//Aca importo todos los endpoints de order
-	routes.OrderRoutes(api_order)
+	// //Aca importo todos los endpoints de order
+	// routes.OrderRoutes(api_order)
 
 	return app
 
