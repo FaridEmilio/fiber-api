@@ -3,7 +3,9 @@ package routes
 import (
 	"errors"
 
+	"github.com/faridEmilio/fiber-api/internal/database"
 	internal "github.com/faridEmilio/fiber-api/internal/database"
+	"github.com/faridEmilio/fiber-api/pkg/domains/user"
 	pkg "github.com/faridEmilio/fiber-api/pkg/entities"
 	"github.com/gofiber/fiber/v2"
 )
@@ -16,8 +18,10 @@ type User struct {
 }
 
 // Aca van todos los endpoints de /user
-func UserRoutes(app fiber.Router) {
-	app.Post("/new", CreateUser())
+func UserRoutes(app fiber.Router, userService user.UserService) {
+
+	//tiene que quedar como app.Post("/new", CreateUser())
+	app.Post("/new", CreateUser(userService))
 	app.Get("/list", GetUsers())
 	app.Get("/find/:id", GetUserById())
 	app.Put("/update/:id", UpdateUser())
@@ -36,9 +40,14 @@ Después de crear el usuario en la base de datos y preparar la respuesta del usu
 y los datos del usuario en formato JSON.
 */
 
-func CreateUser() fiber.Handler {
+func CreateUser(userService user.UserService) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		var user pkg.User
+		var (
+			user pkg.User
+			//request
+			status bool
+			msj    string
+		)
 
 		if err := ctx.BodyParser(&user); err != nil {
 			return ctx.Status(400).JSON(fiber.Map{
@@ -46,15 +55,24 @@ func CreateUser() fiber.Handler {
 			})
 		}
 
-		internal.Database.Db.Create(&user)
-		responseUser := CreateResponseUser(user)
+		status, err := userService.PostCreateUserService()
 
-		return ctx.Status(200).JSON(responseUser)
+		//responseUser := CreateResponseUser(user)
+
+		if err != nil {
+			return fiber.NewError(400, "error: "+err.Error())
+		}
+		msj = "dato registrado con exito"
+
+		return ctx.Status(200).JSON(&fiber.Map{
+			"status":  status,
+			"message": msj,
+		})
 	}
 }
 
 func findUser(id int, user *pkg.User) error {
-	internal.Database.Db.Find(&user, "id= ?", id)
+	database.DbInstance.Find(&user, "id= ?", id)
 
 	if user.ID == 0 {
 		return errors.New("User does not exist")
@@ -138,7 +156,7 @@ func UpdateUser() fiber.Handler {
 		user.FirstName = updateData.FirstName
 		user.LastName = updateData.LastName
 
-		internal.Database.Db.Save(&user)
+		internal.DbInstance.Save(&user)
 
 		responseUser := CreateResponseUser(user)
 

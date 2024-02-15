@@ -1,4 +1,4 @@
-package internal
+package database
 
 import (
 	"fmt"
@@ -15,12 +15,10 @@ import (
 
 // Instancia de base de datos
 type DbInstance struct {
-	Db *gorm.DB
+	*gorm.DB
 }
 
-var Database DbInstance
-
-func ConnectDb() {
+func ConnectDb() *DbInstance {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true", config.USER, config.PASSW, config.HOST, config.PORT, config.DB)
 	// logs.Info(dsn)
 	gormDB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
@@ -45,5 +43,5 @@ func ConnectDb() {
 	log.Println("Running Migrations")
 	gormDB.AutoMigrate(&pkg.User{}, &pkg.Product{}, &pkg.Order{})
 
-	Database = DbInstance{Db: gormDB}
+	return &DbInstance{gormDB}
 }

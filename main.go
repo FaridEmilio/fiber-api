@@ -5,13 +5,13 @@ import (
 	"net/http"
 
 	"github.com/faridEmilio/fiber-api/api/routes"
-	internal "github.com/faridEmilio/fiber-api/internal/database"
+	"github.com/faridEmilio/fiber-api/internal/database"
+	"github.com/faridEmilio/fiber-api/pkg/domains/user"
 	"github.com/gofiber/fiber/v2"
 )
 
-func InicializarApp(clienteHttp *http.Client) *fiber.App {
+func InicializarApp(clienteHttp *http.Client, clienteSql *database.DbInstance) *fiber.App {
 
-	internal.ConnectDb()
 	app := fiber.New(fiber.Config{
 		//Views: engine,
 		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
@@ -38,6 +38,14 @@ func InicializarApp(clienteHttp *http.Client) *fiber.App {
 		return ctx.SendString("My first APi with Fiber")
 	})
 
+	//Inicializo los repositorios con la base de datos
+	//***** Repositories *****//
+	userRepository := user.NewUserRepository(clienteSql)
+
+	//Inicializo los servicios con el repositorio instanciado anteriormente
+	//***** Services *****//
+	userService := user.NewUserService(userRepository)
+
 	// Prefijo comun a mis endpoints de user
 	api_user := app.Group("/api/user")
 
@@ -48,7 +56,7 @@ func InicializarApp(clienteHttp *http.Client) *fiber.App {
 	api_order := app.Group("/api/order")
 
 	//Aca importo todos los endpoints de user
-	routes.UserRoutes(api_user)
+	routes.UserRoutes(api_user, userService)
 
 	//Aca importo todos los endpoints de product
 	routes.ProductRoutes(api_product)
@@ -61,8 +69,9 @@ func InicializarApp(clienteHttp *http.Client) *fiber.App {
 }
 
 func main() {
+	clienteSQL := database.ConnectDb()
 
-	app := InicializarApp(http.DefaultClient)
+	app := InicializarApp(http.DefaultClient, clienteSQL)
 
 	log.Fatal(app.Listen(":3000"))
 }
