@@ -56,3 +56,13 @@ func (*userRepository) GetUsersRepository() {
 func (*userRepository) UpdateUserRepository(entityUser entities.User) (err error) {
 	panic("unimplemented")
 }
+
+func findUser(id int, user *pkg.User) error {
+	database.DbInstance.Find(&user, "id= ?", id)
+
+	if user.ID == 0 {
+		return errors.New("User does not exist")
+	}
+
+	return nil
+}

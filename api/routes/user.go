@@ -1,12 +1,12 @@
 package routes
 
 import (
-	"fmt"
-
 	"github.com/faridEmilio/fiber-api/pkg/domains/user"
 	"github.com/faridEmilio/fiber-api/pkg/dtos/userdtos"
 	pkg "github.com/faridEmilio/fiber-api/pkg/entities"
 	"github.com/gofiber/fiber/v2"
+
+	filtros_user "github.com/faridEmilio/fiber-api/pkg/filtros/user"
 )
 
 type User struct {
@@ -44,21 +44,19 @@ y los datos del usuario en formato JSON.
 func CreateUser(userService user.UserService) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var (
-			user userdtos.RequestPostUser
-			//request
-			status bool
-			msj    string
+			request userdtos.RequestPostUser
+			status  bool
+			msj     string
 		)
 
-		if err := ctx.BodyParser(&user); err != nil {
+		if err := ctx.BodyParser(&request); err != nil {
 			return ctx.Status(400).JSON(fiber.Map{
 				"error": err.Error(),
 			})
 
 		}
-		fmt.Println(user)
 
-		status, err := userService.PostCreateUserService(user)
+		status, err := userService.PostCreateUserService(request)
 
 		//responseUser := CreateResponseUser(user)
 
@@ -74,22 +72,16 @@ func CreateUser(userService user.UserService) fiber.Handler {
 	}
 }
 
-/*
-func findUser(id int, user *pkg.User) error {
-	database.DbInstance.Find(&user, "id= ?", id)
-
-	if user.ID == 0 {
-		return errors.New("User does not exist")
-	}
-
-	return nil
-}
-
-func GetUserById() fiber.Handler {
+func GetUserById(UserService user.UserService) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		id, err := ctx.ParamsInt("id")
+		var (
+			request userdtos.RequestPostUser
+			status  bool
+			msj     string
+		)
 
-		var user pkg.User
+		var filtro filtros_user.UsuarioFiltro
+		id, err := ctx.ParamsInt("id")
 
 		if err != nil {
 			return ctx.Status(400).JSON(fiber.Map{
@@ -109,6 +101,7 @@ func GetUserById() fiber.Handler {
 	}
 }
 
+/*
 func GetUsers() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 
