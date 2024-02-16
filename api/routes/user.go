@@ -5,8 +5,6 @@ import (
 	"github.com/faridEmilio/fiber-api/pkg/dtos/userdtos"
 	pkg "github.com/faridEmilio/fiber-api/pkg/entities"
 	"github.com/gofiber/fiber/v2"
-
-	filtros_user "github.com/faridEmilio/fiber-api/pkg/filtros/user"
 )
 
 type User struct {
@@ -72,16 +70,11 @@ func CreateUser(userService user.UserService) fiber.Handler {
 	}
 }
 
-func GetUserById(UserService user.UserService) fiber.Handler {
+func GetUserById() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		var (
-			request userdtos.RequestPostUser
-			status  bool
-			msj     string
-		)
-
-		var filtro filtros_user.UsuarioFiltro
 		id, err := ctx.ParamsInt("id")
+
+		var user pkg.User
 
 		if err != nil {
 			return ctx.Status(400).JSON(fiber.Map{

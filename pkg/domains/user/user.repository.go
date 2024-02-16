@@ -43,8 +43,20 @@ func (*userRepository) DeleteUserRepository() {
 }
 
 // GetUserByIdRepository implements UserRepository.
-func (*userRepository) GetUserByIdRepository(userId uint) (entityUser entities.User, rowAffected bool, err error) {
-	panic("unimplemented")
+func (r *userRepository) GetUserByIdRepository(userId uint) (entityUser entities.User, rowAffected bool, erro error) {
+	resp := r.SqlClient.Table("users")
+	resp.Where("id = ?", userId).First(&entityUser)
+
+	if resp.Error != nil {
+		erro = errors.New(ERROR_OBTENER_DATO_USER)
+	}
+
+	if resp.RowsAffected == 0 {
+		rowAffected = true
+		return
+	}
+
+	return
 }
 
 // GetUsersRepository implements UserRepository.
